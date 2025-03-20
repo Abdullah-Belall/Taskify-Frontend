@@ -4,7 +4,7 @@ import { Button } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { addTodo, deleteTodo } from "@/app/store/data-slice";
+import { addTodo, updateTodo } from "@/app/store/data-slice";
 
 export default function AddTodo() {
   const [title, setTitle] = useState("");
@@ -18,29 +18,18 @@ export default function AddTodo() {
 
     setLoading(true);
 
-    const newTodo = {
-      id: Date.now().toString(),
-      title,
-      description: "",
-      status: "in-progress" as const,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    dispatch(addTodo({ categoryName, todo: newTodo }));
-
     const response = await COLLECTOR_REQ(NEW_TODO_REQ, {
       categoryName,
       title,
       description: "",
     });
-    if (response.done && response.data) {
+    console.log(response);
+    if (response.done) {
+      console.log("yeeeeeeeeeee");
       dispatch(addTodo({ categoryName, todo: response.data }));
     }
-
-    if (!response.done) {
-      dispatch(deleteTodo({ categoryName, todoId: newTodo.id }));
-      alert("Failed to add todo. Please try again.");
-    }
+    setLoading(false);
+    setTitle("");
   };
 
   return (

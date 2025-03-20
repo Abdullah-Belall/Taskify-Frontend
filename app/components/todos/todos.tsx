@@ -21,6 +21,7 @@ import DeletePopUp from "../popups/delete-category";
 import AddTodo from "./add-todo";
 import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import UpdateCategoryPopUp from "../popups/update-category";
+import Sorted from "../others/sorted-by";
 
 export default function Todos() {
   const dispatch = useDispatch();
@@ -31,10 +32,15 @@ export default function Todos() {
   const categories = useSelector((state: any) =>
     state.todos.categories?.map((cat: any) => cat.categoryName)
   );
-  const selectedTodos = useSelector((state: any) =>
+  const allTodos = useSelector((state: any) =>
     selectTodosByCategory(state, searchParams.get("category") || "")
   );
   const selectedCategory = searchParams.get("category") || "";
+  const selectedStatus = searchParams.get("status") || "all";
+  const selectedTodos = allTodos.filter((todo: Todo) => {
+    if (selectedStatus === "all") return true;
+    return todo.status === selectedStatus;
+  });
 
   const handleClick = (category: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -45,7 +51,7 @@ export default function Todos() {
   useEffect(() => {
     const fetchData = async () => {
       const response = await COLLECTOR_REQ(ALL_DATA_REQ);
-      handleClick(response.data ? response.data[0].categoryName : "");
+      handleClick(response.data ? response.data[0]?.categoryName : "");
       dispatch(setCategories(response.data));
     };
     fetchData();
@@ -103,35 +109,38 @@ export default function Todos() {
       )}
       <MyButtonGroub categores={categories} onClick={handleClick} />
       {categories?.length > 0 && (
-        <div className="w-full flex justify-between items-center bg-[#ffffff2e] rounded-lg p-2">
-          <h2 className="font-semibold">
-            {selectedCategory
-              ? `${selectedCategory.toUpperCase()} Category`
-              : "No Category Selected"}
-          </h2>
-          {selectedCategory && (
-            <div className="flex gap-2">
-              <Button
-                onClick={handleUpdateCategory}
-                style={{
-                  backgroundColor: "#2563eb",
-                }}
-                variant="contained"
-              >
-                <MdOutlineEdit className="text-[20px]" />
-              </Button>
-              <Button
-                onClick={() => setOpenDeletePopUp(true)}
-                style={{
-                  backgroundColor: "red",
-                }}
-                variant="contained"
-              >
-                <MdDeleteOutline className="text-[20px]" />
-              </Button>
-            </div>
-          )}
-        </div>
+        <>
+          <Sorted />
+          <div className="w-full flex justify-between items-center bg-[#ffffff2e] rounded-lg p-2">
+            <h2 className="font-semibold">
+              {selectedCategory
+                ? `${selectedCategory.toUpperCase()} Category`
+                : "No Category Selected"}
+            </h2>
+            {selectedCategory && (
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleUpdateCategory}
+                  style={{
+                    backgroundColor: "#2563eb",
+                  }}
+                  variant="contained"
+                >
+                  <MdOutlineEdit className="text-[20px]" />
+                </Button>
+                <Button
+                  onClick={() => setOpenDeletePopUp(true)}
+                  style={{
+                    backgroundColor: "red",
+                  }}
+                  variant="contained"
+                >
+                  <MdDeleteOutline className="text-[20px]" />
+                </Button>
+              </div>
+            )}
+          </div>
+        </>
       )}
       <ul
         style={{
@@ -142,16 +151,18 @@ export default function Todos() {
         className="w-full flex flex-col gap-3 max-h-[250px] overflow-y-scroll"
       >
         {selectedTodos.length > 0 ? (
-          selectedTodos.map((todo: Todo) => (
-            <TodoComponent
-              key={todo.id}
-              id={todo.id}
-              title={todo.title}
-              description={todo.description}
-              status={todo.status}
-              createdAt={todo.createdAt}
-            />
-          ))
+          selectedTodos.map((todo: Todo) => {
+            return (
+              <TodoComponent
+                key={todo.id}
+                id={todo.id}
+                title={todo.title}
+                description={todo.description}
+                status={todo.status}
+                createdAt={todo.createdAt}
+              />
+            );
+          })
         ) : (
           <p className="px-5 py-4 rounded-lg bg-[#ffffff2e] w-fit mx-auto my-5">No Todos</p>
         )}

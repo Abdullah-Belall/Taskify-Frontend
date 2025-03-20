@@ -14,10 +14,12 @@ export async function POST(req: Request) {
       }
     );
     const data = await backendResponse.json();
-    if (!backendResponse.ok) {
+    const backendCookies = backendResponse.headers.get("set-cookie");
+    const response = NextResponse.json(data, { status: backendResponse.status });
+    if (!backendResponse.ok)
       return NextResponse.json({ error: data }, { status: backendResponse.status });
-    }
-    return NextResponse.json(data, { status: backendResponse.status });
+    if (backendCookies) response.headers.append("Set-Cookie", backendCookies);
+    return response;
   } catch (error: unknown) {
     let errorMessage = "Internal Server Error";
     if (error instanceof Error) {

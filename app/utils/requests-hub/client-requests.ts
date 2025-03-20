@@ -111,6 +111,7 @@ const LOGIN_WITH_CODE_SSTEP_REQ = async (data: {
   try {
     const response: any = await axios.post(`${BASE_URL}/auth/forgot-pass/step-two`, data);
     if (response?.data?.done) {
+      setCookie("access_token", response?.data?.access_token);
       return { done: true };
     } else {
       return { done: false, message: unCountedMessage, status: response.status };
@@ -220,8 +221,9 @@ const DELETE_CATEGORY_REQ = async (data: { categoryName: string }) => {
 const NEW_TODO_REQ = async (data: { categoryName: string }) => {
   try {
     const response: any = await axios.post(`${BASE_URL}/actions/new-todo`, data);
+    console.log(response);
     return response?.data?.done
-      ? { done: true }
+      ? { done: true, data: response.data.data }
       : { done: false, message: unCountedMessage, status: response.status };
   } catch (error: any) {
     let message = unCountedMessage;
