@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { FaCheck } from "react-icons/fa";
 import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
-import { updateTodo } from "@/app/store/data-slice";
+import { setAboutToMiss, updateTodo } from "@/app/store/data-slice";
 import { selectTodosByCategory } from "@/app/store/data-slice";
 import { useState } from "react";
 import EditTodoPopUp from "../popups/edit-todo";
@@ -86,7 +86,6 @@ export default function TodoComponent({
   const handleDelete = () => {
     setIsDeletePopupOpen(true);
   };
-
   return (
     <>
       {isEditPopupOpen && (

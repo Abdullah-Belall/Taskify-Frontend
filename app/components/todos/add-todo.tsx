@@ -23,9 +23,7 @@ export default function AddTodo() {
       title,
       description: "",
     });
-    console.log(response);
     if (response.done) {
-      console.log("yeeeeeeeeeee");
       dispatch(addTodo({ categoryName, todo: response.data }));
     }
     setLoading(false);
@@ -33,7 +31,7 @@ export default function AddTodo() {
   };
 
   return (
-    <div className="w-full p-2 flex gap-2">
+    <div className="w-full px-2 flex gap-2">
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}

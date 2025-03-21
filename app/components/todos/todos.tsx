@@ -12,8 +12,8 @@ import {
   setCategories,
   deleteCategory,
   addCategory,
+  setAboutToMiss,
 } from "@/app/store/data-slice";
-import { Todo } from "@/app/store/data-slice";
 import MyButtonGroub from "../others/my-button-groub";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@mui/material";
@@ -22,6 +22,7 @@ import AddTodo from "./add-todo";
 import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import UpdateCategoryPopUp from "../popups/update-category";
 import Sorted from "../others/sorted-by";
+import { Todo } from "@/app/types/todo";
 
 export default function Todos() {
   const dispatch = useDispatch();
@@ -52,11 +53,27 @@ export default function Todos() {
     const fetchData = async () => {
       const response = await COLLECTOR_REQ(ALL_DATA_REQ);
       handleClick(response.data ? response.data[0]?.categoryName : "");
+      for (let i = 0; i < response.data.length; i++) {
+        response.data[i].data.forEach((e: any) => {
+          e.category = response.data[i].categoryName;
+        });
+      }
+      const allTodos = response.data
+        .map((e: any) => {
+          return e.data;
+        })
+        .flat();
+      const aboutToMiss = allTodos.flat().filter((e: any) => {
+        const createdAt = new Date(e.createdAt);
+        const now = new Date();
+        const diffInHours = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+        return e.status === "in-progress" && diffInHours >= 24;
+      });
+      dispatch(setAboutToMiss(aboutToMiss));
       dispatch(setCategories(response.data));
     };
     fetchData();
   }, [dispatch]);
-
   const handleDelete = async () => {
     if (!selectedCategory) return;
     const deletedCategory = categories?.find((cat: string) => cat === selectedCategory);

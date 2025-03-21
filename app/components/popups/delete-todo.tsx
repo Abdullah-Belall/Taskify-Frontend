@@ -4,20 +4,14 @@ import { Button } from "@mui/material";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { deleteTodo, addTodo } from "@/app/store/data-slice";
+import { Todo } from "@/app/types/todo";
 
 interface DeleteTodoPopUpProps {
   onClose: () => void;
   onTodoDeleted: () => void;
   id: string;
   categoryName: string;
-  todo: {
-    id: string;
-    title: string;
-    description: string;
-    status: "completed" | "in-progress";
-    createdAt: string;
-    updatedAt: string;
-  };
+  todo: Todo;
 }
 
 export default function DeleteTodoPopUp({

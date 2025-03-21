@@ -5,20 +5,19 @@ import { useRouter, useSearchParams } from "next/navigation";
 export default function Sorted() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const currentStatus = searchParams.get("status") || "all"; // القيمة الافتراضية هي "all"
-
+  const currentStatus = searchParams.get("status") || "all";
   const handleSort = (status: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (status === "all") {
-      params.delete("status"); // لو "all"، بنمسح الـ status من الـ searchParams
+      params.delete("status");
     } else {
-      params.set("status", status); // لو "completed" أو "in-progress"، بنحدث الـ status
+      params.set("status", status);
     }
     router.push(`?${params.toString()}`);
   };
 
   return (
-    <div className="flex gap-2 mb-4">
+    <div className="flex gap-2">
       <Button
         onClick={() => handleSort("all")}
         style={{

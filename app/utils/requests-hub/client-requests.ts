@@ -1,7 +1,7 @@
 "use client";
 import axios from "axios";
 import { BaseWebsiteLink, unCountedMessage } from "../base";
-export interface ReqResInterface {
+interface ReqResInterface {
   done: boolean;
   message?: string;
   status?: number;
@@ -221,7 +221,6 @@ const DELETE_CATEGORY_REQ = async (data: { categoryName: string }) => {
 const NEW_TODO_REQ = async (data: { categoryName: string }) => {
   try {
     const response: any = await axios.post(`${BASE_URL}/actions/new-todo`, data);
-    console.log(response);
     return response?.data?.done
       ? { done: true, data: response.data.data }
       : { done: false, message: unCountedMessage, status: response.status };

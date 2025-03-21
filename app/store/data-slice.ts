@@ -1,25 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-export interface Todo {
-  id: string;
-  title: string;
-  description: string;
-  status: "in-progress" | "completed";
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface Category {
-  categoryName: string;
-  data: Todo[];
-}
-
-interface TodoState {
-  categories: Category[];
-}
+import { Category, Todo, TodoState } from "../types/todo";
 
 const initialState: TodoState = {
   categories: [],
+  aboutToMiss: [],
 };
 
 const todoSlice = createSlice({
@@ -28,6 +12,9 @@ const todoSlice = createSlice({
   reducers: {
     setCategories(state, action: PayloadAction<Category[]>) {
       state.categories = action.payload;
+    },
+    setAboutToMiss(state, action: PayloadAction<Todo[]>) {
+      state.aboutToMiss = action.payload;
     },
     addCategory(state, action: PayloadAction<{ categoryName: string }>) {
       state.categories.push({
@@ -59,10 +46,19 @@ const todoSlice = createSlice({
       const category = state.categories.find(
         (cat) => cat.categoryName === action.payload.categoryName
       );
+      const base = action.payload.updatedTodo;
       if (category) {
         const todoIndex = category.data.findIndex((todo) => todo.id === action.payload.todoId);
         if (todoIndex !== -1) {
-          category.data[todoIndex] = { ...category.data[todoIndex], ...action.payload.updatedTodo };
+          category.data[todoIndex] = { ...category.data[todoIndex], ...base };
+        }
+        const createdAt = new Date(category.data[todoIndex].createdAt);
+        const now = new Date();
+        const diffInHours = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+        if (base.status === "in-progress" && diffInHours >= 24) {
+          state.aboutToMiss = [...state.aboutToMiss, category.data[todoIndex]];
+        } else {
+          state.aboutToMiss = state.aboutToMiss.filter((e) => e.id !== action.payload.todoId);
         }
       }
     },
@@ -78,6 +74,7 @@ const todoSlice = createSlice({
 });
 export const {
   setCategories,
+  setAboutToMiss,
   addCategory,
   updateCategoryName,
   deleteCategory,
